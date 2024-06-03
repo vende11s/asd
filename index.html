@@ -24,6 +24,10 @@
     </style>
     <div id="con">
     <pre id="waz">
+          /\
+         /  \
+        /    \
+       /      \
         |    |
         |    o
         |   /|  .--o
@@ -60,13 +64,22 @@
         |   |
         |   |
         |   |
+        |   |
+        |   |
+        |   |
     </pre>
 
 
     <script>
+        var asd = 0;
         document.addEventListener('scroll',function(){
             var pre = document.querySelector('pre');
-            pre.innerText = pre.innerText + '        |   |\n';
+            if(asd == 0){
+                pre.innerText = pre.innerText + '    |   |\n';
+            }
+            else{
+            pre.innerText = pre.innerText + '        |   |\n'; }
+            asd++;
         });
     </script>
 </body>
