@@ -50,6 +50,7 @@ def mergeSort(head):
     return merge(left, right)
 
 
+######### USE CASE ##########
 
 l = Node(2)
 l.next = Node(1)
