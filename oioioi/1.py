@@ -4,35 +4,33 @@ import bisect
 
 OIOIOI = True
 
-# least significant bit
-def LSB(i):
-    return i & -i
-
-def update(FenT, i, to_add):
-    while i < len(FenT):
-        FenT[i] += to_add
-        i += LSB(i)
-
-# sum arr from [1 to i]
-def query(FenT, i):
-    result = 0
-    while i != 0:
-        result += FenT[i]
-        i -= LSB(i)
-    return result
-
 def solution(T):
-    T_sorted = sorted(T)
-    T_ind = [0] * len(T)
+    # least significant bit
+    def LSB(i):
+        return i & -i
 
-    for i in range(len(T)):
-        T_ind[i] = bisect.bisect_left(T_sorted, T[i]) + 1
+    def update(FenT, i, to_add):
+        while i < len(FenT):
+            FenT[i] += to_add
+            i += LSB(i)
+
+    # sum arr from [1 to i]
+    def query(FenT, i):
+        result = 0
+        while i != 0:
+            result += FenT[i]
+            i -= LSB(i)
+        return result
     
-    FenT = [0] * (len(T) + 2)
+    unique_T = sorted(list(set(T)))
+    ranks = {s: i+1 for i, s in enumerate(unique_T)}
+    
+    FenT = [0] * (len(unique_T) + 2)
     max_found = 0
-    for x in T_ind:
-         max_found = max(max_found, query(FenT, x-1))
-         update(FenT, x, 1)
+    for s in T:
+        x = ranks[s]
+        max_found = max(max_found, query(FenT, x-1))
+        update(FenT, x, 1)
     
     return max_found
         
