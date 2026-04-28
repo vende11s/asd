@@ -1,0 +1,191 @@
+\documentclass[12pt]{article}
+\usepackage[a4paper, margin=2.5cm]{geometry}
+\usepackage[polish]{babel}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{libertine} % Odpowiednik Libertinus Serif
+\usepackage{xcolor}
+\usepackage{soul}
+\usepackage{tcolorbox}
+\usepackage[hidelinks]{hyperref}
+
+% 1. Definiujesz swoją własną paletę markerów
+\definecolor{zolty}{HTML}{fef08a}
+\definecolor{pomaranczowy}{HTML}{fdba74}
+\definecolor{niebieski}{HTML}{93c5fd}
+\definecolor{tloboksu}{HTML}{f8fafc}
+\definecolor{ramkaboksu}{HTML}{3b82f6}
+
+% Komenda do markera (domyślnie żółty)
+\newcommand{\marker}[2][zolty]{{\sethlcolor{#1}\hl{#2}}}
+
+% 2. Elegancka ramka na definicje i wzory
+\newtcolorbox{wazne}[1][Ważne]{
+  colback=tloboksu,
+  colframe=ramkaboksu,
+  boxrule=0pt,
+  leftrule=3pt,
+  arc=2pt,
+  title={\textbf{#1:}},
+  coltitle=black,
+  fonttitle=\bfseries,
+  attach title to upper=\newline
+}
+
+\newtcolorbox{kod}{
+  colback=tloboksu,
+  boxrule=0pt,
+  arc=2pt
+}
+
+\newcommand{\przerwa}{\vspace{0.5cm}}
+
+% Szablony na nagłówki
+\newcommand{\cwiczenia}[3]{
+  \begin{center}
+    \section*{Ćwiczenia #1 - \marker{#3}}
+    {\small #2}
+  \end{center}
+}
+
+\newcommand{\wyklad}[3]{
+  \begin{center}
+    \section*{Wykład #1 - \marker[pomaranczowy]{#3}}
+    {\small #2}
+  \end{center}
+}
+
+\newcommand{\notatka}[1]{
+  \begin{center}
+    \section*{Notatka - \marker[niebieski]{#1}}
+  \end{center}
+}
+
+\begin{document}
+
+% Spis treści
+\tableofcontents
+\section{Stabilność sortów}
+Stabilny sort nie psuje poprzedniego układu 
+Jak masz listę graczy już posortowaną alfabetycznie. Teraz chcesz ich posortować drugi raz, ale po zdobytych punktach. Jeśli algorytm jest \textbf{stabilny}, to gracze z taką samą liczbą punktów dalej będą ułożeni alfabetycznie.
+
+Totalny gamechanger i must-have, gdy musisz posortować dane po kilku kryteriach po kolei.
+
+\przerwa
+
+\begin{center}
+ \section*{Sorty proste $O(n^2)$}
+ raczej brak realnych zastosowań
+\end{center}
+
+\section{Bubble sort}
+\subsection{Działanie}
+Lecisz parami od lewej do prawej. Jak element po lewej jest większy od tego po prawej, to robisz swap. I tak w kółko, aż największe elementy "wypłyną" na sam koniec tablicy jak bąbelki. 
+\subsection{Złożoność}
+Czasowa: $O(n^2)$ \\
+Pamięciowa: $O(1)$
+\subsection{Stabilność}
+\textbf{Stabilny}
+
+\section{Insertion sort}
+\subsection{Działanie}
+Wyobraź sobie, że układasz karty w ręce. Bierzesz kolejną z kupki i wpychasz ją w odpowiednie miejsce wśród tych, które już masz ułożone w dłoni. 
+\subsection{Zastosowanie}
+Fajnie się sprawdza, jak tablica jest już prawie posortowana albo jest totalnie malutka. Często używany wewnątrz Quick Sorta dla małych podtablic.
+\subsection{Złożoność}
+Czasowa: $O(n^2)$ (ale optymistyczna dla prawie posortowanych to $O(n)$) \\
+Pamięciowa: $O(1)$
+\subsection{Stabilność}
+\textbf{Stabilny}.
+
+\section{Selection sort}
+\subsection{Działanie}
+Skanujesz całą tablicę, znajdujesz absolutnie najmniejszy element i wrzucasz go na sam początek (zamieniasz z pierwszym). Potem szukasz najmniejszego z pozostałych i dajesz na drugie miejsce. I tak do oporu.
+\subsection{Złożoność}
+Czasowa: $O(n^2)$  \\
+Pamięciowa: $O(1)$
+\subsection{Stabilność}
+\textbf{Niestabilny}
+\newpage
+\begin{center}
+  \section*{Sorty szybkie $O(n \log n)$}
+  z porównaniami
+\end{center}
+
+\section{Merge sort}
+\subsection{Działanie}
+Klasyczne podejście Dziel i Zwyciężaj (Divide and Conquer). Tniemy tablicę w połowie, potem te połówki znów na pół, aż zostaną nam z tego pojedyncze elementy. Potem zaczynamy je ze sobą sklejac, ale układając je od razu rosnąco.
+\subsection{Zastosowanie}
+Top do sortowania linked list, jedyny sort szybki $O(n \log n)$ który jest stabilny.
+\subsection{Złożoność}
+Czasowa: $O(n \log n)$ (realnie najwolniejszy szybki przez dużą stałą)\\
+Pamięciowa: $O(n)$
+\subsection{Stabilność}
+\textbf{Stabilny}.
+
+\section{Heap sort}
+\subsection{Działanie}
+Budujemy z naszej tablicy strukturę zwaną kopcem (max-heap) – to takie drzewo, gdzie stary jest zawsze większy od dzieci. Potem zdejmujemy korzeń (bo wiemy, że jest największy z całej paczki), wrzucamy go na koniec tablicy i naprawiamy to, co zostało z kopca. Powtarzamy, aż posortujemy całość.
+\subsection{Zastosowanie}
+Potrzebujesz 100\% pewności $O(n \log n)$? Jakiś krytyczny system coś? To jest to
+\subsection{Złożoność}
+Czasowa: $O(n \log n)$\\
+Pamięciowa: $O(1)$
+\subsection{Stabilność}
+\textbf{Niestabilny}.
+
+\section{Quick sort}
+\subsection{Działanie}
+Wybierasz sobie jeden element (tzw. pivot). Potem rzucasz wszystkie mniejsze od pivota na lewo od niego, a większe na prawo. W ten sposób pivot ląduje na swoim ostatecznym miejscu. Następnie robisz dokładnie to samo (rekurencyjnie) dla lewej i prawej strony.
+\subsection{Zastosowanie}
+Defaultowy sort ogólnego przeznaczenia. Kiedy nie wiesz, jak dokładnie wyglądają dane, zależy ci na prędkości średniej i 
+\subsection{Złożoność}
+Czasowa średnia: $O(n \log n)$\\
+Czasowa najgorsza: $O(n^2)$\\
+Pamięciowa: $O(\log n)$
+\subsection{Stabilność}
+\textbf{Niestabilny} 
+
+\begin{center}
+  \section*{Sorty szybkie $O(n)$}
+  bez porównań
+\end{center}
+
+\section{Counting sort}
+\subsection{Działanie}
+Robimy sobie nową tablicę z licznikami. Przelatujemy przez dane i po prostu zliczamy: "mam trzy piątki, dwa zera". Potem na podstawie tych liczników odtwarzamy po kolei posortowaną tablicę.
+\subsection{Zastosowanie}
+Masz $10^8$ liczb z wąskiego zakresu np. 0-1000? To jest to
+\subsection{Złożoność}
+Czasowa: $O(n+k)$\\
+Pamięciowa: $O(k)$\\
+gdzie k to zakres liczb
+\subsection{Stabilność}
+\textbf{Stabilny} (jak się go mądrze napisze od końca).
+
+\section{Radix sort}
+\subsection{Działanie}
+Sortujemy liczby (lub stringi) cyfra po cyfrze. Najpierw układamy wszystko np. po jednościach (używając jakiegoś stabilnego sorta, najczęściej Counting Sorta), potem po dziesiątkach, setkach itd. Na sam koniec całe liczby wyjdą nam ładnie poukładane.
+\subsection{Zastosowanie}
+Masz 10 milionów kodów długości 12 do posortowania? To jest to
+\subsection{Złożoność}
+Czasowa: $O(d \cdot (n+k))$\\
+Pamięciowa: $O(n+k)$\\
+gdzie k to zakres liczb, a d to największa liczba (ilość cyfr)
+\subsection{Stabilność}
+\textbf{Stabilny} (wręcz MUSI taki być, inaczej cały algorytm sypie się na starcie – dlatego wewnętrznie bazuje na innym stabilnym sorcie).
+
+\section{Bucket sort}
+\subsection{Działanie}
+Rozrzucamy nasze dane do tzw. "wiaderek" (np. liczby 0-9 do pierwszego, 10-19 do drugiego). Skoro wiemy, że dane są w miarę równo rozłożone, to w wiaderkach wyląduje mało elementów. Sortujemy sobie każde wiaderko osobno (najczęściej Insertion sortem) i zlewamy wszystko z powrotem w jedną całość.
+\subsection{Zastosowanie}
+Dane są równomiernie rozłożone? W zadaniu jest wspomniany \textbf{rozkład jednostajny}? To jest to
+\subsection{Złożoność}
+Czasowa średnia: $O(n+k)$\\
+Czasowa najgorsza: $O(n^2)$ - gdy wszystkie liczby wpadną do jednego wiadra\\
+Pamięciowa: $O(n+k)$\\
+gdzie k to liczba wiader, typowa liczba wiader to $n$
+\subsection{Stabilność}
+\textbf{Stabilny} (o ile sort, którego używasz wewnątrz wiaderek, np. Insertion sort, jest stabilny).
+
+\end{document}

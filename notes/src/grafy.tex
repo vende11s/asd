@@ -1,0 +1,102 @@
+\documentclass[12pt, a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[polish]{babel}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{geometry}
+\geometry{a4paper, margin=2cm}
+\usepackage{enumitem}
+
+\title{\textbf{Algorytmy Grafowe -- Kompendium na Kolokwium}}
+\author{}
+\date{}
+
+\begin{document}
+
+\maketitle
+
+\section{Reprezentacja grafu}
+\begin{itemize}
+    \item \textbf{Lista krawędzi:} Tablica krotek, np. \texttt{[(u, v, w), ...]}. Często stosowana jako wejście w zadaniach lub w algorytmie Kruskala.
+    \item \textbf{Reprezentacja macierzowa:} Tablica $n \times n$. Jeśli jest krawędź z $v$ do $w$, to \texttt{tab[v][w] = waga} (lub \texttt{True} jak krawędzie nie mają wag). Brak krawędzi to np. $0$.
+    \item \textbf{Listy sąsiedztwa (najczęstsza):} W \texttt{tab[i]} mamy listę wierzchołków (oraz wag), do których prowadzi krawędź z $i$. Idealna dla BFS, DFS, Dijkstry. Złożoność większości algorytmów zależy od tego, że możemy szybko przejrzeć tylko istniejące krawędzie z danego wierzchołka.
+\end{itemize}
+
+\section{Przeszukiwanie grafu}
+\subsection{BFS (Przeszukiwanie wszerz)}
+Wykorzystuje kolejkę (np. \texttt{collections.deque}). Idealny do znajdowania \textbf{najkrótszej ścieżki w grafach nieważonych} (gdzie każda krawędź ma wagę 1). Złożoność: $O(V+E)$.
+
+\subsection{DFS (Przeszukiwanie w głąb)}
+Wykorzystuje rekurencję (lub stos). Podstawa do wielu zaawansowanych algorytmów (sortowanie topologiczne, spójne składowe, mosty). Złożoność: $O(V+E)$.
+
+\section{Zaawansowane zastosowania DFS}
+\begin{itemize}
+    \item \textbf{Sortowanie topologiczne (DAG):} Uruchamiamy DFS. W momencie "przetworzenia" wierzchołka (gdy odwiedzimy wszystkich jego sąsiadów i kończymy w nim wywołanie rekurencyjne), dopisujemy go \textbf{na początek} tworzonej listy (kolejności). 
+    \textit{Zastosowanie na kolokwiach:} Zadania z zależnościami, np. harmonogramowanie projektów, gdzie projekt A musi być wykonany przed projektem B.
+    
+    \item \textbf{Cykl Eulera:} Przejście przez wszystkie krawędzie grafu dokładnie raz. Graf nieskierowany ma cykl Eulera wtw. gdy jest spójny i każdy wierzchołek ma stopień \textbf{parzysty}. 
+    \textit{Algorytm:} DFS, w którym na bieżąco usuwamy odwiedzane krawędzie. W momencie, gdy z wierzchołka nie wychodzą już żadne krawędzie, dopisujemy go na początek cyklu. Uwaga: dla list sąsiedztwa warto mieć je posortowane, jeśli wymagana jest konkretna kolejność leksykograficzna.
+    
+    \item \textbf{Silnie Spójne Składowe (SCC - Kosaraju):} 
+    1. Uruchom DFS i zapisz czasy przetworzenia wierzchołków. 
+    2. Odwróć kierunek wszystkich krawędzi w grafie. 
+    3. Wykonaj DFS ponownie, analizując wierzchołki w kolejności malejących czasów przetworzenia z kroku 1.
+    
+    \item \textbf{Mosty (krawędzie, których usunięcie rozspójnia graf):} 
+    Wykonujemy DFS, zapisując czasy odwiedzenia $d(v)$. \\
+    Dla każdego wierzchołka liczymy: \\
+    $low(v) = \min(d(v), \text{min } d(u) \text{ dla krawędzi wstecznych}, \text{min } low(w) \text{ dla dzieci w drzewie DFS})$. Krawędź $\{parent(v), v\}$ jest mostem, gdy $low(v) = d(v)$.
+\end{itemize}
+
+\section{Najkrótsze ścieżki w grafach ważonych}
+\subsection{Algorytm Dijkstry}
+Służy do szukania najkrótszych ścieżek z jednego źródła do pozostałych wierzchołków. \\ \textbf{Warunek:} Brak krawędzi o wagach ujemnych. \\ Złożoność: $O(E \log V)$.
+
+\textbf{Istotny niuans implementacyjny (optymalizacja):}
+Zgodnie z wytycznymi z wykładów, \textbf{nie należy} wrzucać na początku wszystkich wierzchołków z wagą $\infty$ do kolejki priorytetowej. Zamiast tego: \\
+1. Inicjalizujemy tablicę odległości $d$ wartościami $\infty$, a odległość dla startu $s.d = 0$. \\
+2. Do kolejki wrzucamy tylko wierzchołek startowy. \\
+3. Gdy wykonujemy relaksację krawędzi $(u, v)$ i znajdujemy krótszą ścieżkę ($u.d + w(u,v) < v.d$), uaktualniamy $v.d$ i \textbf{dodajemy wierzchołek $v$ ponownie do kolejki} z nową, mniejszą wagą. Wierzchołki wyciągnięte z kolejki z wagą większą niż ich aktualne $v.d$ po prostu ignorujemy.
+
+\subsection{Algorytm Bellmana-Forda}
+Dopuszcza wagi ujemne (tylko w grafach skierowanych, inaczej krawędź ujemna tworzy ujemny cykl).\\ Złożoność: $O(V \cdot E)$.\\
+\textit{Algorytm:} $V-1$ razy przechodzimy przez wszystkie krawędzie w grafie i wykonujemy dla nich relaksację. Na koniec wykonujemy dodatkowe, $V$-te przejście -- jeśli jakakolwiek relaksacja nadal zmniejsza dystans, oznacza to istnienie \textbf{cyklu o ujemnej wadze}.
+
+\section{Minimalne Drzewo Rozpinające (MST)}
+Szukamy podzbioru krawędzi grafu nieskierowanego, który łączy wszystkie wierzchołki (tworzy drzewo) i ma minimalną sumę wag.
+
+\subsection{Algorytm Kruskala}
+1. Sortujemy wszystkie krawędzie grafu rosnąco po wagach. Złożoność sortowania to $O(E \log V)$.
+2. Przechodzimy przez posortowane krawędzie. Jeśli krawędź łączy dwa różne zbiory wierzchołków (nie tworzy cyklu), dodajemy ją do MST.
+
+\textbf{Niuans implementacyjny (Find-Union / Lasy Zbiorów Rozłącznych):}
+Aby szybko sprawdzać cykle, używamy struktury Find-Union opartej na tablicach \texttt{parent} i \texttt{rank}. 
+Kluczowe optymalizacje, które obniżają złożoność operacji do $O(\log^* V)$ (logarytm iterowany, w praktyce $O(1)$):
+\begin{itemize}
+    \item \textbf{Kompresja ścieżki w \texttt{find\_set(x)}:} Podczas szukania reprezentanta zbioru, przepinamy \texttt{x.parent} (oraz wszystkich przodków po drodze) bezpośrednio na znalezionego reprezentanta głównego.
+    \item \textbf{Łączenie według rangi (Union by rank):} W funkcji \texttt{union(x, y)}, mniejsze drzewo (o mniejszej randze) dołączamy pod korzeń wyższego drzewa. Jeśli rangi są równe, wybieramy dowolny korzeń i zwiększamy jego rangę o 1. Zapewnia to płytkość drzew.
+\end{itemize}
+
+\subsection{Algorytm Prima}
+Buduje MST podobnie jak Dijkstra szuka ścieżek. Zaczynamy od dowolnego wierzchołka. Trzymamy w kolejce priorytetowej wierzchołki, a kluczem jest waga najtańszej krawędzi łączącej dany wierzchołek z aktualnie zbudowanym fragmentem drzewa. W każdym kroku wyjmujemy najtańszy wierzchołek i aktualizujemy koszty dotarcia do jego sąsiadów.
+
+\section{Motywy z zadań z poprzednich kolokwiów (Wskazówki)}
+
+Na podstawie historycznych zadań (m.in. \textit{Warrior, SpaceTravel, Let's Roll, Beautree}) powtarzają się konkretne schematy:
+
+\begin{enumerate}
+    \item \textbf{Grafy z rozszerzonym stanem (Grafy warstwowe / Dijksta na stanach):}
+    Częsty motyw to szukanie najkrótszej trasy, ale z pewnym ograniczeniem (np. "kierowca musi zmienić się co 3 postoje", "wojownik musi odpocząć w schronisku po 16h", "magiczne zagięcia czasoprzestrzeni").
+    \textit{Rozwiązanie:} Wierzchołkiem w algorytmie (np. w kolejce Dijkstry) nie jest tylko \texttt{numer\_miasta}, ale krotka ze \textbf{stanem}, np. \texttt{(odleglosc, u, aktualne\_zmeczenie)} lub \texttt{(odleglosc, u, czy\_wykorzystano\_magie)}. Tablica odległości staje się wtedy tablicą 2D lub słownikiem: \texttt{dist[u][stan]}.
+    
+    \item \textbf{Modyfikacje MST (Kruskala):}
+    Zadania typu: znajdź drzewo rozpinające, w którym różnica między najdroższą a najtańszą krawędzią jest specyficzna (tzw. "piękne drzewo"). 
+    \textit{Rozwiązanie:} Ponieważ krawędzi jest zazwyczaj mało (złożoność $O(E^2)$ jest często akceptowalna), można posortować krawędzie rosnąco, a następnie próbować budować MST z algorytmu Kruskala, wymuszając by najmniejszą krawędzią drzewa była $i$-ta krawędź z posortowanej listy (pętla po $E$, w środku uruchamiamy Kruskala).
+    
+    \item \textbf{Zależności i harmonogramy:}
+    Zadania mówiące, że "projekt A musi być wykonany przed B", a możemy wykonywać dowolnie wiele naraz. 
+    \textit{Rozwiązanie:} Jest to klasyczny graf skierowany i \textbf{Sortowanie Topologiczne}. Jeśli wierzchołek zależy od innych, jego najwcześniejszy czas ukończenia to $\max(\text{czasy ukończenia poprzedników}) + 1$.
+\end{enumerate}
+
+\end{document}
