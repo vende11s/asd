@@ -1,5 +1,6 @@
 '''
 zwraca najkrotsze sciezki ze startu do kazdego z wierzcholkow
+O(E log V)
 '''
 
 from queue import PriorityQueue
@@ -22,8 +23,8 @@ def dijkstra(G, start):
     while not Q.empty():
         dist, v = Q.get()
 
-        for n in G[v]:
-            dist_n = dist + n[1]
+        for n, weight in G[v]:
+            dist_n = dist + weight
             if dist_n > distances[n]:
                 continue
             distances[n] = dist_n
